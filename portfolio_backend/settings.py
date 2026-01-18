@@ -25,9 +25,26 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # Update ALLOWED_HOSTS
-# add the Render domain via environment variable
-ALLOWED_HOSTS = config(
-    'ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+# Base hosts (local + safe defaults)
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# Render-specific dynamic host (recommended by Render docs)
+# Render auto-sets this env var to your exact service domain (e.g. portfolio-backend-sr1l.o
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# Wildcard fallback – catches most Render internal/proxy variants
+ALLOWED_HOSTS.append('.onrender.com')
+
+# Trust Render's proxy for HTTPS and Host
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
+# Optional but recommended for full security
+SECURE_SSL_REDIRECT = True           # Redirect HTTP → HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 
 # Application definitions
