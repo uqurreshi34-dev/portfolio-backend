@@ -10,10 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import logging
 from pathlib import Path
 import os
 # from decouple import config
 import dj_database_url
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,8 +42,21 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Recommended fallback: catches occasional internal/proxy variants during health checks
 ALLOWED_HOSTS.append('.onrender.com')
 
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS", "").split(",")  # get from render
+# Super-safe way — works even with trailing spaces, newlines, or copy-paste gremlins
+raw = os.environ.get("CORS_ALLOWED_ORIGINS", "")
+
+# Split by comma, strip whitespace/newlines, and ignore empties
+origins = [origin.strip() for origin in raw.split(",") if origin.strip()]
+
+CORS_ALLOWED_ORIGINS = origins or [
+    "http://localhost:3000",
+    "https://portfolio-frontend-rho-lyart.vercel.app"
+]
+
+# Optional: print for debugging on Render logs (remove later)
+logger = logging.getLogger(__name__)
+logger.warning("CORS_ALLOWED_ORIGINS loaded as: %s", CORS_ALLOWED_ORIGINS)
+
 # Application definitions
 
 INSTALLED_APPS = [
