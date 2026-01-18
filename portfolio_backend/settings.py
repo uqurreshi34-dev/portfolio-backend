@@ -25,7 +25,9 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # Update ALLOWED_HOSTS
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app', '.render.com']
+# add the Render domain via environment variable
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'  # added this for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -53,11 +56,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# CORS Settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://your-vercel-app.vercel.app",  # Update with your Vercel URL later
-]
+# CORS Settings - add the Vercel domain via environment variable
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='http://localhost:3000'
+).split(',')
 
 ROOT_URLCONF = 'portfolio_backend.urls'
 
@@ -88,15 +91,16 @@ DATABASE_URL = str(config('DATABASE_URL'))
 DATABASES = {
     'default': dj_database_url.config(
         default=DATABASE_URL,
-        conn_max_age=600
+        conn_max_age=300
     )
 }
 
-# Static files
 # For serving CSS, JavaScript, images that are part of Django (like Django Admin styles)
 # You need this ONLY if you're using Django's admin panel or Django templates
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 # For user-uploaded files (profile pictures, documents, etc.)

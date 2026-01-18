@@ -1,2 +1,13 @@
 # All .env files + variations (very safe & common)
 .env*
+
+
+
+
+venv/
+*.pyc
+__pycache__/
+*.sqlite3
+media/
+staticfiles/
+*.log
