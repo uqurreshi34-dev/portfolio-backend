@@ -22,3 +22,5 @@ class SkillAdmin(admin.ModelAdmin):
 class ContactAdmin(admin.ModelAdmin):
     list_display = ['name', 'email', 'subject', 'created_at']
     list_filter = ['created_at']
+    # This forces newest first in the admin change list
+    ordering = ['-created_at']
