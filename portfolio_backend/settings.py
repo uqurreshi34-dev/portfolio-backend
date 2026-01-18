@@ -12,41 +12,24 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
-from decouple import config
+# from decouple import config
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-# Update SECRET_KEY
-SECRET_KEY = config('SECRET_KEY', default='your-fallback-secret-key')
-DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# Update ALLOWED_HOSTS
-# Base hosts (local + safe defaults)
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# Render-specific dynamic host (recommended by Render docs)
-# Render auto-sets this env var to your exact service domain (e.g. portfolio-backend-sr1l.o
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-insecure-placeholder")
 
-# Wildcard fallback – catches most Render internal/proxy variants
-ALLOWED_HOSTS.append('.onrender.com')
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get("DEBUG")
 
-# Trust Render's proxy for HTTPS and Host
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-USE_X_FORWARDED_HOST = True
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 
-# Optional but recommended for full security
-SECURE_SSL_REDIRECT = True           # Redirect HTTP → HTTPS
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-
-
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
 # Application definitions
 
 INSTALLED_APPS = [
@@ -73,11 +56,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# CORS Settings - add the Vercel domain via environment variable
-CORS_ALLOWED_ORIGINS = config(
-    'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:3000'
-).split(',')
 
 ROOT_URLCONF = 'portfolio_backend.urls'
 
@@ -103,15 +81,12 @@ WSGI_APPLICATION = 'portfolio_backend.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 # Database configuration
-DATABASE_URL = str(config('DATABASE_URL'))
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=300
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL")
     )
 }
-
 # For serving CSS, JavaScript, images that are part of Django (like Django Admin styles)
 # You need this ONLY if you're using Django's admin panel or Django templates
 # Static files (CSS, JavaScript, Images)
