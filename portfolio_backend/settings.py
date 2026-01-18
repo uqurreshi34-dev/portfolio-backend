@@ -22,14 +22,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-insecure-placeholder")
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "dev-insecure-placeholder")  # get from render
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG")
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 
-CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']  # safe defaults for local dev
+
+# Render automatically provides this env var with your exact service hostname
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# Recommended fallback: catches occasional internal/proxy variants during health checks
+ALLOWED_HOSTS.append('.onrender.com')
+
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    "CORS_ALLOWED_ORIGINS", "").split(",")  # get from render
 # Application definitions
 
 INSTALLED_APPS = [
@@ -84,7 +96,7 @@ WSGI_APPLICATION = 'portfolio_backend.wsgi.application'
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL")
+        default=os.environ.get("DATABASE_URL")  # get from render
     )
 }
 # For serving CSS, JavaScript, images that are part of Django (like Django Admin styles)
