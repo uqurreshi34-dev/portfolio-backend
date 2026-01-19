@@ -15,10 +15,11 @@ from pathlib import Path
 import os
 # from decouple import config
 import dj_database_url
-from corsheaders.defaults import default_headers
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')  # this makes os.environ see your .env vars
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -109,9 +110,11 @@ WSGI_APPLICATION = 'portfolio_backend.wsgi.application'
 
 # Database configuration
 
+# Now DATABASE_URL is available locally from .env, and on Render from env vars
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL")  # get from render
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=300,       # good for Neon
     )
 }
 # For serving CSS, JavaScript, images that are part of Django (like Django Admin styles)
