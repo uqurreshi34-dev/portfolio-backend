@@ -138,6 +138,8 @@ class Service(models.Model):
 
     def get_features_list(self):
         return [f.strip() for f in self.features.split('\n') if f.strip()]
+        # It takes "SEO, Fast Delivery, Responsive Design"
+        # Returns ["SEO", "Fast Delivery", "Responsive Design"]
 
 
 class SocialPost(models.Model):
